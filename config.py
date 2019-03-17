@@ -26,41 +26,66 @@ reddit_username = os.environ.get("REDDIT_USER")
 reddit_password = os.environ.get("REDDIT_PASS")
 
 # This configuration handles the subreddits that should be parsed by the script,
-# defines parsing behavior, and the configuration for the playlist.
+# defines parsing behavior, and the configuration for the playlist(s).
 #
 # Note: Each key should be the name of a subreddit.
+#       Each key should have an array as its value. This array is comprised of Dicts that contain the below:
 
 # playlist_name (required) - The name of the Google Music playlist that should be created/overwritten.
 # playlist_description - The desired description text for the playlist.
 # sort_by (required) - the method by which reddit posts should be searched.
 # sort_by_range - the time range that reddit posts should be searched across.
 # search (list) - search terms for which posts will be compared against.
-# post_artist_track_delimeter -
+# post_artist_track_delimiter -
 #   A character that will help the script determine where the name of the artist is separated from the track's name.
 # post_artist_track_order - Determines whether the artist or track should appear first in the post title.
 # strip_from_search_results (list) - When a post is found according to the search criteria,
 #   this list determines what parts of the post title should be removed prior to performing a song search.
 subreddits = {
-    'hiphopheads': {
+    'hiphopheads': [
+        {
             "playlist_name": "HipHopHeads Top Weekly",
             "playlist_description": "[FRESH] weekly posts from reddit.com/r/hiphopheads",
             "sort_by": "top",
             "sort_by_range": "week",
             "search": ["[FRESH]"],
-            "post_artist_track_delimeter": '-',
+            "post_artist_track_delimiter": '-',
             "post_artist_track_order": 'AT',
             "strip_from_search_results": ["[FRESH]"]
         },
-    'indieheads': {
+        {
+            "playlist_name": "HipHopHeads Top Monthly",
+            "playlist_description": "[FRESH] monthly posts from reddit.com/r/hiphopheads",
+            "sort_by": "top",
+            "sort_by_range": "month",
+            "search": ["[FRESH]"],
+            "post_artist_track_delimiter": '-',
+            "post_artist_track_order": 'AT',
+            "strip_from_search_results": ["[FRESH]"]
+        }
+    ],
+    'indieheads': [
+        {
+            "playlist_name": "IndieHeads Top Weekly",
+            "playlist_description": "Top [FRESH] posts from reddit.com/r/indieheads for the week.",
+            "sort_by": "top",
+            "sort_by_range": "week",
+            "search": ["[FRESH]"],
+            "post_artist_track_order": 'AT',
+            "post_artist_track_delimiter": '-',
+            "strip_from_search_results": ["[FRESH]"]
+        },
+        {
             "playlist_name": "IndieHeads Top Monthly",
             "playlist_description": "Top [FRESH] posts from reddit.com/r/indieheads for the month.",
             "sort_by": "top",
             "sort_by_range": "month",
             "search": ["[FRESH]"],
             "post_artist_track_order": 'AT',
-            "post_artist_track_delimeter": '-',
+            "post_artist_track_delimiter": '-',
             "strip_from_search_results": ["[FRESH]"]
-        }
+        },
+    ]
 }
 
 

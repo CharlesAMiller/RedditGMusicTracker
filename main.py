@@ -12,7 +12,6 @@ from config import logger
     Todo:
         * Actually have the script fallback to the defaults specified in config_options in config.py
         * Perform query in a separate function from the function that handles matching.
-        * Change the spelling of delimiter, I guess.
 
     date: 10/06/2018
     username: porthog
@@ -107,14 +106,15 @@ def match_song(artist, track):
     song_hits = [song_hit['track'] for song_hit in search_results['song_hits']]
 
     for hit in song_hits:
-        if(is_match(hit['title'], track) and is_match(hit['artist'], artist)):
+        if (is_match(hit['title'], track) and is_match(hit['artist'], artist)):
             return hit['storeId']
 
     return None
 
+
 def plain_search_match(search):
     """
-           Performs a Google Music search for the given plaintext query.
+       Performs a Google Music search for the given plaintext query.
        :return:    Either the Google Music store listing id for the first eligible search result.
                    or None in the instance that no appropriate tracks could be found.
        """
@@ -123,10 +123,11 @@ def plain_search_match(search):
     song_hits = [song_hit['track'] for song_hit in search_results['song_hits']]
 
     for hit in song_hits:
-        if(is_match(hit['title'], search)):
+        if (is_match(hit['title'], search)):
             return hit['storeId']
 
     return None
+
 
 def create_or_update_playlist(playlist_config):
     """
@@ -151,8 +152,8 @@ def create_or_update_playlist(playlist_config):
     else:
         # Otherwise, create the playlist if it couldn't be found.
         playlist_id = gmusic.create_playlist(playlist_config["playlist_name"],
-                               playlist_config["playlist_description"],
-                               True)
+                                             playlist_config["playlist_description"],
+                                             True)
         logger.info("Playlist created " + playlist_id)
 
     return playlist_id
@@ -173,7 +174,7 @@ def find_songs_from_submissions(reddit_submissions, subreddit_config):
     songs = []
 
     # Configured settings.
-    delimeter = subreddit_config["post_artist_track_delimeter"]
+    delimiter = subreddit_config["post_artist_track_delimiter"]
     track_artist_order = subreddit_config["post_artist_track_order"]
     stripTerms = subreddit_config["strip_from_search_results"]
 
@@ -192,7 +193,7 @@ def find_songs_from_submissions(reddit_submissions, subreddit_config):
         for term in stripTerms:
             title = title.replace(term, "")
 
-        split_title = title.split(delimeter)
+        split_title = title.split(delimiter)
 
         artist_track = ()
 
@@ -236,16 +237,17 @@ if logged_in:
 
     logger.info("Logged in")
 
-    for subReddit, subRedditConfig in config.subreddits.iteritems():
-
+    for subReddit, parserConfigurations in config.subreddits.iteritems():
         logger.info("Generating songs for " + subReddit)
 
-        validate_configuration(subRedditConfig)
-        posts = find_posts_in_subreddit(subReddit, subRedditConfig)
-        songs, no_matches = find_songs_from_submissions(posts, subRedditConfig)
-        playlist_id = create_or_update_playlist(subRedditConfig)
+        # A subreddit may have multiple playlist configurations.
+        for configuration in parserConfigurations:
+            validate_configuration(configuration)
+            posts = find_posts_in_subreddit(subReddit, configuration)
+            songs, no_matches = find_songs_from_submissions(posts, configuration)
+            playlist_id = create_or_update_playlist(configuration)
 
-        logger.info("Number of songs matched: {}".format(len(songs)))
-        logger.info("No matches for: {}".format(no_matches))
+            logger.info("Number of songs matched: {}".format(len(songs)))
+            logger.info("No matches for: {}".format(no_matches))
 
-        gmusic.add_songs_to_playlist(playlist_id, songs)
+            gmusic.add_songs_to_playlist(playlist_id, songs)
